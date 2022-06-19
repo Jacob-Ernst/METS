@@ -1,58 +1,70 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"log"
-	"math"
-	"os"
+
+	"gitlab.com/jacob-ernst/mets/pkg/calories"
+	"gitlab.com/jacob-ernst/mets/pkg/conversions"
 )
 
-// Formula constant for calculating Calories per minute.
-const calorieConst float64 = 3.5
-
-const kgConversion float64 = 0.45359237
-
-func burnRate(MET, kg float64) float64 {
-	return (MET * calorieConst * kg) / 200
-}
-
-func lbTokg(lb float64) float64 {
-	return roundWeight(lb * kgConversion)
-}
-
-func roundWeight(weight float64) float64 {
-	return math.Round(weight*10.0) / 10.0
-}
-
-func totalBurn(w io.Writer, kg, MET, time float64) {
-	calPerMinute := burnRate(MET, kg)
-
-	calories := calPerMinute * time
-
-	// Print with default width and precision of 2 (for rounding).
-	fmt.Fprintf(w, "You burned %.2f Calories\n", calories)
+var activities = map[string]float64{
+	"power mower": 4.5,
 }
 
 func main() {
+	var activity string
 	var kg, lb, MET, minutes float64
-	flag.Float64Var(&kg, "kg", -99, "your weight in KG")
-	flag.Float64Var(&lb, "lb", -99, "your weight in pounds")
-	flag.Float64Var(&MET, "met", 5.00, "MET for the task")
+	flag.StringVar(&activity, "activity", "", "the activity you engaged in")
+	flag.Float64Var(&kg, "kg", -1, "your weight in KG")
+	flag.Float64Var(&lb, "lb", -1, "your weight in pounds")
+	flag.Float64Var(&MET, "met", -1, "MET for the task")
 	flag.Float64Var(&minutes, "time", 20.00, "time you spent in minutes")
 	flag.Parse()
 
-	if kg == -99 && lb == -99 {
-		log.Fatalln("Must provide either -kg or -lb.")
+	effort, err := getMET(activity, MET)
+	if err != nil {
+		log.Fatalln(err)
 	}
 
+	weight, err := convertWeight(kg, lb)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	total := calories.TotalBurn(weight, effort, minutes)
+
+	fmt.Printf("You burned %.2f Calories\n", total)
+}
+
+// Returns weight in kg when able, otherwise converts lbs to kg.
+func convertWeight(kg, lb float64) (float64, error) {
 	if kg >= 1 {
-		totalBurn(os.Stdout, kg, MET, minutes)
-		return
+		return kg, nil
 	}
 
-	kg = lbTokg(lb)
+	if lb < 1 {
+		return -1, errors.New("Must provide either -kg or -lb.")
+	}
 
-	totalBurn(os.Stdout, kg, MET, minutes)
+	return conversions.PoundsToMetric(lb), nil
+}
+
+func getMET(activity string, MET float64) (float64, error) {
+	if MET >= 1 {
+		return MET, nil
+	}
+
+	if activity == "" {
+		return -1, errors.New("Must provide either -activity or -met.")
+	}
+
+	value := activities[activity]
+	if value < 1 {
+		return -1, errors.New("Activity not found.")
+	}
+
+	return value, nil
 }
