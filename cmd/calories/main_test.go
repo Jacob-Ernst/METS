@@ -43,6 +43,8 @@ func Test_convertWeight(t *testing.T) {
 }
 
 func Test_getMET(t *testing.T) {
+	openDB("file::memory:?cache=shared")
+
 	type args struct {
 		activity string
 		MET      float64

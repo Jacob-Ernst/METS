@@ -6,13 +6,15 @@ import (
 	"fmt"
 	"log"
 
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+
 	"gitlab.com/jacob-ernst/mets/pkg/calories"
 	"gitlab.com/jacob-ernst/mets/pkg/conversions"
+	"gitlab.com/jacob-ernst/mets/pkg/models"
 )
 
-var activities = map[string]float64{
-	"power mower": 4.5,
-}
+var db *gorm.DB
 
 func main() {
 	var activity string
@@ -23,6 +25,11 @@ func main() {
 	flag.Float64Var(&MET, "met", -1, "MET for the task")
 	flag.Float64Var(&minutes, "time", 20.00, "time you spent in minutes")
 	flag.Parse()
+
+	err := openDB("tmp/dev.db")
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	effort, err := getMET(activity, MET)
 	if err != nil {
@@ -61,10 +68,28 @@ func getMET(activity string, MET float64) (float64, error) {
 		return -1, errors.New("Must provide either -activity or -met.")
 	}
 
-	value := activities[activity]
-	if value < 1 {
-		return -1, errors.New("Activity not found.")
+	var value models.Activity
+	result := db.First(&value, "name = ?", activity)
+	if result.Error != nil {
+		return -1, result.Error
 	}
 
-	return value, nil
+	return value.Effort, nil
+}
+
+func openDB(dbName string) (err error) {
+	db, err = gorm.Open(sqlite.Open(dbName), &gorm.Config{})
+	if err != nil {
+		return err
+	}
+
+	// Migrate the schema
+	err = db.AutoMigrate(&models.Activity{})
+	if err != nil {
+		return err
+	}
+
+	// Create
+	db.Create(&models.Activity{Name: "power mower", Effort: 4.5})
+	return nil
 }
