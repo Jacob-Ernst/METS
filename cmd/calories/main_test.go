@@ -2,6 +2,8 @@ package main
 
 import (
 	"testing"
+
+	"gitlab.com/jacob-ernst/mets/pkg/models"
 )
 
 func Test_convertWeight(t *testing.T) {
@@ -43,8 +45,7 @@ func Test_convertWeight(t *testing.T) {
 }
 
 func Test_getMET(t *testing.T) {
-	openDB("file::memory:?cache=shared")
-
+	testHelperOpenDB()
 	type args struct {
 		activity string
 		MET      float64
@@ -88,4 +89,9 @@ func Test_getMET(t *testing.T) {
 			}
 		})
 	}
+}
+
+func testHelperOpenDB() {
+	db, _ = models.OpenDB("file::memory:?cache=shared")
+	db.Create(&models.Activity{Name: "power mower", Effort: 4.5})
 }

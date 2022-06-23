@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
 	"gitlab.com/jacob-ernst/mets/pkg/calories"
@@ -17,6 +16,7 @@ import (
 var db *gorm.DB
 
 func main() {
+	var err error
 	var activity string
 	var kg, lb, MET, minutes float64
 	flag.StringVar(&activity, "activity", "", "the activity you engaged in")
@@ -26,7 +26,7 @@ func main() {
 	flag.Float64Var(&minutes, "time", 20.00, "time you spent in minutes")
 	flag.Parse()
 
-	err := openDB("tmp/dev.db")
+	db, err = models.OpenDB("tmp/dev.db")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -75,21 +75,4 @@ func getMET(activity string, MET float64) (float64, error) {
 	}
 
 	return value.Effort, nil
-}
-
-func openDB(dbName string) (err error) {
-	db, err = gorm.Open(sqlite.Open(dbName), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-
-	// Migrate the schema
-	err = db.AutoMigrate(&models.Activity{})
-	if err != nil {
-		return err
-	}
-
-	// Create
-	db.Create(&models.Activity{Name: "power mower", Effort: 4.5})
-	return nil
 }
