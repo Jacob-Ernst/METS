@@ -93,3 +93,13 @@ Temporary Items
 # Ignore files under "tmp/", but keep the directory
 tmp/*
 !tmp/.gitkeep
+
+# secrets
+.env*
+!.env.example
+
+# go-task output
+.task
+
+# SQLite files
+data/*.db
