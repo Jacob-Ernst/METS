@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Activity struct {
 	gorm.Model
-	Name        string
+	Name        string `gorm:"uniqueIndex"`
 	Description string
 	Effort      float64
 }
