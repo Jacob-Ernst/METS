@@ -1,25 +1,18 @@
 version: '3'
 
-vars:
-  DEV_DB: data/dev.db
-  TEST_DB: data/test.db
-
 dotenv: ['.env']
 
 tasks:
   db:init:dev:
     cmds:
-      - sqlite3 {{.DEV_DB}} '.read data/seeds.sql'
+      - go run ./cmd/migrate -dsn {{.DB_FILE}}
+      - sqlite3 {{.DB_FILE}} '.read data/seeds.sql'
     generates:
-      - "{{.DEV_DB}}"
-
-  db:init:test:
-    cmds:
-      - sqlite3 {{.TEST_DB}} '.read data/seeds.sql'
-    generates:
-      - "{{.TEST_DB}}"
+      - "{{.DB_FILE}}"
+    sources:
+      - cmd/migrate/main.go
+      - data/seeds.sql
 
   test:
-    deps: [db:init:test]
     cmds:
       - go test -v
