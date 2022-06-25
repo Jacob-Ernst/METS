@@ -26,7 +26,7 @@ func main() {
 	flag.Float64Var(&minutes, "time", 20.00, "time you spent in minutes")
 	flag.Parse()
 
-	db, err = models.OpenDB("tmp/dev.db")
+	db, err = models.OpenDB("data/dev.db")
 	if err != nil {
 		log.Fatalln(err)
 	}
