@@ -27,17 +27,17 @@ type ListCommand struct {
 	dsn string `validate:"file"`
 }
 
-func (g *ListCommand) Name() string {
-	return g.fs.Name()
+func (l *ListCommand) Name() string {
+	return l.fs.Name()
 }
 
-func (g *ListCommand) Init(args []string) error {
-	return g.fs.Parse(args)
+func (l *ListCommand) Init(args []string) error {
+	return l.fs.Parse(args)
 }
 
-func (g *ListCommand) Validate() error {
+func (l *ListCommand) Validate() error {
 	validator := validator.New()
-	input := ListInput{DSN: g.dsn}
+	input := ListInput{DSN: l.dsn}
 
 	err := validator.Struct(input)
 	if err != nil {
@@ -47,9 +47,9 @@ func (g *ListCommand) Validate() error {
 	return nil
 }
 
-func (g *ListCommand) Run() error {
+func (l *ListCommand) Run() error {
 	var activities []models.Activity
-	db, err := models.OpenDB(g.dsn)
+	db, err := models.OpenDB(l.dsn)
 	if err != nil {
 		return err
 	}

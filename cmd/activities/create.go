@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"log"
+	"fmt"
 
 	"github.com/go-playground/validator/v10"
 	"gitlab.com/jacob-ernst/mets/pkg/models"
@@ -36,17 +36,17 @@ type CreateCommand struct {
 	met  float64 `validate:"required,gte=0.5"`
 }
 
-func (g *CreateCommand) Name() string {
-	return g.fs.Name()
+func (c *CreateCommand) Name() string {
+	return c.fs.Name()
 }
 
-func (g *CreateCommand) Init(args []string) error {
-	return g.fs.Parse(args)
+func (c *CreateCommand) Init(args []string) error {
+	return c.fs.Parse(args)
 }
 
-func (g *CreateCommand) Validate() error {
+func (c *CreateCommand) Validate() error {
 	validator := validator.New()
-	input := CreateInput{Name: g.name, DSN: g.dsn, MET: g.met}
+	input := CreateInput{Name: c.name, DSN: c.dsn, MET: c.met}
 
 	err := validator.Struct(input)
 	if err != nil {
@@ -56,20 +56,20 @@ func (g *CreateCommand) Validate() error {
 	return nil
 }
 
-func (g *CreateCommand) Run() error {
-	db, err := models.OpenDB(g.dsn)
+func (c *CreateCommand) Run() error {
+	db, err := models.OpenDB(c.dsn)
 	if err != nil {
 		return err
 	}
 
-	activity := models.Activity{Name: g.name, Description: g.desc, Effort: g.met}
+	activity := models.Activity{Name: c.name, Description: c.desc, Effort: c.met}
 
 	tx := db.Create(&activity)
 	if tx.Error != nil {
 		return tx.Error
 	}
 
-	log.Printf("[id: %v, name: %v] Successfully created activity", activity.ID, activity.Name)
+	fmt.Printf("[id: %v, name: %v] Successfully created activity", activity.ID, activity.Name)
 
 	return nil
 }
