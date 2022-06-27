@@ -21,6 +21,7 @@ func root(args []string) (err error) {
 
 	cmds := []Runner{
 		NewCreateCommand(),
+		NewListCommand(),
 	}
 
 	subcommand := os.Args[1]
