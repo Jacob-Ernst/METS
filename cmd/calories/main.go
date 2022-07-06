@@ -69,7 +69,8 @@ func getMET(activity string, MET float64) (float64, error) {
 	}
 
 	var value models.Activity
-	result := db.First(&value, "name = ?", activity)
+	query := fmt.Sprintf("%%%v%%", activity)
+	result := db.First(&value, "name LIKE ?", query)
 	if result.Error != nil {
 		return -1, result.Error
 	}
