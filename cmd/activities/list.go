@@ -9,7 +9,8 @@ import (
 )
 
 type ListInput struct {
-	DSN string `validate:"file"`
+	DSN   string `validate:"file"`
+	Limit int    `validate:"gte=1"`
 }
 
 func NewListCommand() *ListCommand {
@@ -18,13 +19,17 @@ func NewListCommand() *ListCommand {
 	}
 
 	cc.fs.StringVar(&cc.dsn, "dsn", "data/dev.db", "dsn for the DB to migrate")
+	cc.fs.IntVar(&cc.limit, "limit", 3, "optional limit for number of results")
+	cc.fs.StringVar(&cc.query, "query", "", "optional search query to filter by")
 	return cc
 }
 
 type ListCommand struct {
 	fs *flag.FlagSet
 
-	dsn string `validate:"file"`
+	dsn   string
+	limit int
+	query string
 }
 
 func (l *ListCommand) Name() string {
@@ -37,7 +42,7 @@ func (l *ListCommand) Init(args []string) error {
 
 func (l *ListCommand) Validate() error {
 	validator := validator.New()
-	input := ListInput{DSN: l.dsn}
+	input := ListInput{DSN: l.dsn, Limit: l.limit}
 
 	err := validator.Struct(input)
 	if err != nil {
@@ -54,7 +59,14 @@ func (l *ListCommand) Run() error {
 		return err
 	}
 
-	tx := db.Select("name", "effort", "description").Order("effort desc").Find(&activities)
+	tx := db
+
+	if l.query != "" {
+		query := fmt.Sprintf("%%%v%%", l.query)
+		tx = db.Where("name LIKE ?", query)
+	}
+
+	tx = tx.Select("name", "effort", "description").Order("effort desc").Limit(l.limit).Find(&activities)
 
 	if tx.Error != nil {
 		return tx.Error
