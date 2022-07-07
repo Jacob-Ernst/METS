@@ -27,6 +27,10 @@ performing a task.
   designed for ease of use and performance.
 - [GORM](https://gorm.io/) - Fully-featured ORM for Go.
 
+### Inspiration
+
+- I'm taking inspiration from [fiber-boilerplate](https://github.com/thomasvvugt/fiber-boilerplate) for structuring Fiber and supporting packages.
+
 ## Getting Started
 
 ### Prerequisites
@@ -67,6 +71,8 @@ TBD
 TBD
 
 ---
+
+## References
 
 [^1]: https://www.healthline.com/health/what-are-mets#met-goals
 [^2]: https://en.wikipedia.org/wiki/Metabolic_equivalent_of_task
