@@ -3,7 +3,9 @@
 <p>
 <details>
 <summary>Table of contents</summary>
+
 [[_TOC_]]
+
 </details>
 </p>
 
@@ -31,29 +33,24 @@ performing a task.
 
 - example
 
----
-
 ### Installation
-
-#### First Steps
 
 - Clone this repository
 
-#### Setting up your ENV
+### Setting up your ENV
 
-- eacmple
+- example
+
+---
 
 ## Usage
 
 TBD
 
----
-
 ### Testing
 
 TBD
 
----
 
 ### Development
 
@@ -68,6 +65,8 @@ TBD
 ### Building
 
 TBD
+
+---
 
 [^1]: https://www.healthline.com/health/what-are-mets#met-goals
 [^2]: https://en.wikipedia.org/wiki/Metabolic_equivalent_of_task
