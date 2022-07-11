@@ -4,6 +4,7 @@ import (
 	"gitlab.com/jacob-ernst/mets/pkg/database"
 	"gitlab.com/jacob-ernst/mets/pkg/models"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -53,13 +54,29 @@ func GetActivity(db *database.Database) fiber.Handler {
 	}
 }
 
+type AddParams struct {
+	Effort      float64 `validate:"required,gte=0.5"`
+	Name        string  `validate:"required"`
+	Description string
+}
+
 // Add a single activity to the database
 func AddActivity(db *database.Database) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		validator := validator.New()
+		params := new(AddParams)
 		Activity := new(models.Activity)
 		if err := ctx.BodyParser(Activity); err != nil {
 			panic("An error occurred when parsing the new activity: " + err.Error())
 		}
+		if err := validator.Struct(params); err != nil {
+			panic("An error occurred when validating the new activity: " + err.Error())
+		}
+
+		Activity.Name = params.Name
+		Activity.Description = params.Description
+		Activity.Effort = params.Effort
+
 		if response := db.Create(&Activity); response.Error != nil {
 			panic("An error occurred when storing the new activity: " + response.Error.Error())
 		}
@@ -71,14 +88,25 @@ func AddActivity(db *database.Database) fiber.Handler {
 	}
 }
 
+type EditParams struct {
+	ID          uint    `validate:"required,gte=1"`
+	Effort      float64 `validate:"required,gte=0.5"`
+	Name        string  `validate:"required"`
+	Description string
+}
+
 // Edit a single activity
 func EditActivity(db *database.Database) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		validator := validator.New()
 		id := ctx.Params("id")
-		EditActivity := new(models.Activity)
+		params := new(EditParams)
 		Activity := new(models.Activity)
-		if err := ctx.BodyParser(EditActivity); err != nil {
+		if err := ctx.BodyParser(params); err != nil {
 			panic("An error occurred when parsing the edited activity: " + err.Error())
+		}
+		if err := validator.Struct(params); err != nil {
+			panic("An error occurred when validating the new activity: " + err.Error())
 		}
 		if response := db.Find(&Activity, id); response.Error != nil {
 			panic("An error occurred when retrieving the existing activity: " + response.Error.Error())
@@ -97,8 +125,9 @@ func EditActivity(db *database.Database) fiber.Handler {
 			}
 			return err
 		}
-		Activity.Name = EditActivity.Name
-		Activity.Description = EditActivity.Description
+		Activity.Name = params.Name
+		Activity.Description = params.Description
+		Activity.Effort = params.Effort
 		db.Save(&Activity)
 
 		err := ctx.JSON(Activity)
