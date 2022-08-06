@@ -6,7 +6,7 @@ tasks:
   db:init:dev:
     cmds:
       - go run ./cmd/migrate -dsn {{.DB_FILE}}
-      - sqlite3 {{.DB_FILE}} '.read data/seeds.sql'
+      - sqlite3 {{.DB_FILE}} '.read db/seeds.sql'
     generates:
       - "{{.DB_FILE}}"
     sources:

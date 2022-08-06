@@ -106,12 +106,13 @@ func (config *Config) setDefaults() {
 	config.SetDefault("APP_ENV", "local")
 
 	// Set default database configuration
-	config.SetDefault("DB_DRIVER", "sqlite")
-	config.SetDefault("DB_HOST", "localhost")
-	config.SetDefault("DB_USERNAME", "fiber")
-	config.SetDefault("DB_PASSWORD", "password")
-	config.SetDefault("DB_PORT", 3306)
-	config.SetDefault("DB_DATABASE", "boilerplate")
+	config.SetDefault("DB_DRIVER", "postgres")
+	config.SetDefault("DB_HOST", "postgres")
+	config.SetDefault("DB_USERNAME", "mets")
+	config.SetDefault("DB_PASSWORD", "mets-development")
+	config.SetDefault("DB_PORT", 5432)
+	config.SetDefault("DB_DATABASE", "development")
+	config.SetDefault("DB_CACHED", false)
 
 	// Set default hasher configuration
 	config.SetDefault("HASHER_DRIVER", "argon2id")
@@ -123,13 +124,13 @@ func (config *Config) setDefaults() {
 	config.SetDefault("HASHER_ROUNDS", bcrypt.DefaultRounds)
 
 	// Set default session configuration
-	config.SetDefault("SESSION_PROVIDER", "sqlite")
+	config.SetDefault("SESSION_PROVIDER", "redis")
 	config.SetDefault("SESSION_KEYPREFIX", "session")
-	config.SetDefault("SESSION_HOST", "localhost")
-	config.SetDefault("SESSION_PORT", 3306)
-	config.SetDefault("SESSION_USERNAME", "fiber")
-	config.SetDefault("SESSION_PASSWORD", "secret")
-	config.SetDefault("SESSION_DATABASE", "boilerplate")
+	config.SetDefault("SESSION_HOST", "redis")
+	config.SetDefault("SESSION_PORT", 6379)
+	config.SetDefault("SESSION_USERNAME", "")
+	config.SetDefault("SESSION_PASSWORD", "")
+	config.SetDefault("SESSION_DATABASE", 0)
 	config.SetDefault("SESSION_TABLENAME", "sessions")
 	config.SetDefault("SESSION_LOOKUP", "cookie:session_id")
 	config.SetDefault("SESSION_DOMAIN", "")

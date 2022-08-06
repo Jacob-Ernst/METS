@@ -101,4 +101,5 @@ tmp/*
 .task
 
 # SQLite files
-data/*.db
+data/*
+!data/.gitkeep

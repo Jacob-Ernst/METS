@@ -66,7 +66,7 @@ func AddActivity(db *database.Database) fiber.Handler {
 		validator := validator.New()
 		params := new(AddParams)
 		Activity := new(models.Activity)
-		if err := ctx.BodyParser(Activity); err != nil {
+		if err := ctx.BodyParser(params); err != nil {
 			panic("An error occurred when parsing the new activity: " + err.Error())
 		}
 		if err := validator.Struct(params); err != nil {
