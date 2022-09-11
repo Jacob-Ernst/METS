@@ -74,6 +74,16 @@ func main() {
 				fmt.Println("failed to automigrate activity model:", err.Error())
 				return
 			}
+			err = app.DB.AutoMigrate(&models.Role{})
+			if err != nil {
+				fmt.Println("failed to automigrate role model:", err.Error())
+				return
+			}
+			err = app.DB.AutoMigrate(&models.User{})
+			if err != nil {
+				fmt.Println("failed to automigrate user model:", err.Error())
+				return
+			}
 		}
 	}
 
