@@ -3,15 +3,39 @@ version: '3'
 dotenv: ['.env']
 
 tasks:
-  db:init:dev:
+  db:seed:
+    desc: Seed local database
+    deps: [db:start]
+    env:
+      DB_HOST: localhost
     cmds:
-      - go run ./cmd/migrate -dsn {{.DB_FILE}}
-      - sqlite3 {{.DB_FILE}} '.read db/seeds.sql'
-    generates:
-      - "{{.DB_FILE}}"
+      - go run ./cmd/seeder
+
+  db:start:
+    desc: Start local DB in background
+    status:
+      - docker ps | grep mets-postgres >/dev/null 2>&1
+    cmds:
+      - docker compose up -d postgres
+
+  docker:setup:
+    desc: Build Docker resources
+    cmds:
+      - docker compose build server
+    status:
+      - docker inspect --type=image {{.DEV_CONTAINER_TAG}} >/dev/null 2>&1
     sources:
-      - cmd/migrate/main.go
-      - data/seeds.sql
+      - Dockerfile
+      - docker-compose.yml
+      - .dockerignore
+      - go.mod
+      - go.sum
+
+  docker:teardown:
+    desc: Remove Docker containers, images, volumes, and networks (if any)
+    cmds:
+      - docker compose down --volumes
+      - docker rmi {{.DEV_CONTAINER_TAG}}
 
   test:
     cmds:
