@@ -6,6 +6,7 @@ import (
 	configuration "gitlab.com/jacob-ernst/mets/pkg/config"
 	"gitlab.com/jacob-ernst/mets/pkg/database"
 	"gitlab.com/jacob-ernst/mets/pkg/models"
+	"gorm.io/gorm/clause"
 )
 
 func main() {
@@ -55,30 +56,32 @@ func seedData(db *database.Database) error {
 		return err
 	}
 
+	log.Println("seeding roles")
+	err = seedRoles(db)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func seedActivities(db *database.Database) error {
-	var count int
-	tx := db.Exec("INSERT INTO activities (name, effort) VALUES ('power mower', 4.5) ON CONFLICT (name) DO NOTHING")
+	tx := db.Clauses(clause.OnConflict{DoNothing: true}).Create(&activityRecords)
 	if tx.Error != nil {
 		return tx.Error
 	}
-	count++
 
-	tx = db.Exec("INSERT INTO activities (name, description, effort) VALUES ('running, 4 mph', 'Running 15 min/mile', 6) ON CONFLICT (name) DO NOTHING")
+	log.Printf("inserted %d activities", tx.RowsAffected)
+	return nil
+}
+
+func seedRoles(db *database.Database) error {
+	tx := db.Clauses(clause.OnConflict{DoNothing: true}).Create(&roleRecords)
 	if tx.Error != nil {
 		return tx.Error
 	}
-	count++
 
-	tx = db.Exec("INSERT INTO activities (name, description, effort) VALUES ('sitting tasks, light effort', 'Examples are office work, chemistry lab work, computer work, light assembly repair, watch repair, reading, desk work', 1.5) ON CONFLICT (name) DO NOTHING")
-	if tx.Error != nil {
-		return tx.Error
-	}
-	count++
-
-	log.Printf("inserted or updated %d activities", count)
+	log.Printf("inserted %d roles", tx.RowsAffected)
 	return nil
 }
 
