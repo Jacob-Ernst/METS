@@ -13,6 +13,7 @@ tasks:
 
   db:start:
     desc: Start local DB in background
+    deps: [docker:setup]
     status:
       - docker ps | grep mets-postgres >/dev/null 2>&1
     cmds:
@@ -36,6 +37,12 @@ tasks:
     cmds:
       - docker compose down --volumes
       - docker rmi {{.DEV_CONTAINER_TAG}}
+
+  start:
+    desc: Start development server
+    deps: [docker:setup]
+    cmds:
+      - docker compose up
 
   test:
     cmds:
