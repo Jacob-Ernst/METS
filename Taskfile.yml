@@ -44,6 +44,17 @@ tasks:
     cmds:
       - docker compose up
 
+  stop:
+    desc: Stop development server
+    cmds:
+      - docker compose stop
+
   test:
     cmds:
       - go test -v
+
+  up:
+    desc: Start dev server in background
+    deps: [docker:setup]
+    cmds:
+      - docker compose up -d
