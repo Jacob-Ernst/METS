@@ -31,6 +31,8 @@ tasks:
       - .dockerignore
       - go.mod
       - go.sum
+      - cmd/**/*.go
+      - pkg/**/*.go
 
   docker:teardown:
     desc: Remove Docker containers, images, volumes, and networks (if any)
