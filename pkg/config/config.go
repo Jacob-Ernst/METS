@@ -154,6 +154,7 @@ func (config *Config) setDefaults() {
 	config.SetDefault("FIBER_VIEWS_RELOAD", false)
 	config.SetDefault("FIBER_VIEWS_DEBUG", false)
 	config.SetDefault("FIBER_VIEWS_LAYOUT", "embed")
+	config.SetDefault("FIBER_VIEWS_MAIN_LAYOUT", "layouts/main")
 	config.SetDefault("FIBER_VIEWS_DELIMS_L", "{{")
 	config.SetDefault("FIBER_VIEWS_DELIMS_R", "}}")
 	config.SetDefault("FIBER_READTIMEOUT", 0)
@@ -281,6 +282,7 @@ func (config *Config) setFiberConfig() {
 		BodyLimit:                 config.GetInt("FIBER_BODYLIMIT"),
 		Concurrency:               config.GetInt("FIBER_CONCURRENCY"),
 		Views:                     config.getFiberViewsEngine(),
+		ViewsLayout:               config.GetString("FIBER_VIEWS_MAIN_LAYOUT"),
 		ReadTimeout:               config.GetDuration("FIBER_READTIMEOUT"),
 		WriteTimeout:              config.GetDuration("FIBER_WRITETIMEOUT"),
 		IdleTimeout:               config.GetDuration("FIBER_IDLETIMEOUT"),
